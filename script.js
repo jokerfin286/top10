@@ -78,9 +78,9 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `images/${image}`,
+    src: `/images/${image}`,  // Путь с ведущим слэшем
     score: 0,
-    selected: false, // Помечаем, что фотография еще не была выбрана
+    selected: false,
 }));
 
 let leftPhotoData;
