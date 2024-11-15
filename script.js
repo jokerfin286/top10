@@ -78,7 +78,7 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `/images/${image}`,  // Путь с ведущим слэшем
+    src: `/images/${image}`,  // Это правильный путь для GitHub Pages
     score: 0,
     selected: false,
 }));
