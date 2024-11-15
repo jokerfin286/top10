@@ -78,7 +78,7 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `images/${image}`, // Изменили путь на относительный
+    src: `images/${image}`, // путь без начального "/"
     score: 0,
     selected: false,
 }));
