@@ -1,0 +1,143 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 20px auto;
+    width: 80%;
+}
+
+h1, h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.photo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    position: relative;
+}
+
+.photo {
+    width: 300px;
+    height: 400px;
+    object-fit: cover;
+    border: 3px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.photo.selected {
+    transform: scale(1.2);
+    border-color: #4CAF50;
+    z-index: 10;
+}
+
+.photo.fade-out {
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.photo.fade-in {
+    opacity: 0;
+    animation: fadeIn 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.photo-container div {
+    text-align: center;
+    margin: 10px;
+}
+
+/* Основные стили для контейнера */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Стили для заголовка */
+h2 {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Стили для списка Топ-10 */
+.top10-list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+    padding: 0;
+    list-style-type: none;
+}
+
+/* Стиль для каждого элемента списка */
+.top10-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #f9f9f9;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.top10-item:hover {
+    background-color: #e6e6e6;
+}
+
+/* Стили для ранга */
+.top10-rank {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    width: 40px;
+    text-align: center;
+}
+
+/* Стили для фотографии */
+.top10-photo {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+/* Стили для баллов */
+.top10-score {
+    font-size: 18px;
+    font-weight: 500;
+    color: #666;
+}
