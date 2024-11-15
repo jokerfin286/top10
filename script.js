@@ -4,7 +4,7 @@ let container = document.querySelector('.photo-container');
 
 // Список всех изображений с баллами
 const images = [
-    '1 (1).jpg',
+    '1-1.jpg',
     '1 (2).jpg',
     '1 (3).jpg',
     '1 (4).jpg',
@@ -78,7 +78,7 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `/images/${image}`,  // Это правильный путь для GitHub Pages
+    src: `/images/${image}`,
     score: 0,
     selected: false,
 }));
