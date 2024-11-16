@@ -187,3 +187,77 @@ const initialPhotos = getRandomPhotos();
 if (initialPhotos) {
     updatePhotos(initialPhotos[0], initialPhotos[1]);
 }
+
+
+// Подключение docx
+const { Document, Packer, Paragraph, TextRun, ImageRun } = docx;
+
+// Функция для сохранения результатов в Word
+async function saveResultsToWord() {
+    const document = new Document();
+
+    // Заголовок
+    document.addSection({
+        children: [
+            new Paragraph({
+                text: "Топ-10 самых красивых девушек",
+                heading: "Heading1",
+                alignment: "center",
+            }),
+        ],
+    });
+
+    // Добавляем каждый элемент топа в документ
+    const top10 = photos.sort((a, b) => b.score - a.score).slice(0, 10);
+    for (const [index, photo] of top10.entries()) {
+        const rankText = new Paragraph({
+            text: `${index + 1}. Место - ${photo.score} баллов`,
+            spacing: { after: 200 },
+        });
+
+        // Загружаем изображение как base64
+        const imgResponse = await fetch(photo.src);
+        const imgBlob = await imgResponse.blob();
+        const imgBuffer = await imgBlob.arrayBuffer();
+
+        const imageRun = new ImageRun({
+            data: imgBuffer,
+            transformation: {
+                width: 150,
+                height: 150,
+            },
+        });
+
+        const imgParagraph = new Paragraph({
+            children: [imageRun],
+            alignment: "center",
+        });
+
+        // Добавляем в документ
+        document.addSection({
+            children: [rankText, imgParagraph],
+        });
+    }
+
+    // Сохраняем документ как Word-файл
+    const packer = new Packer();
+    const blob = await packer.toBlob(document);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Top10_Girls.docx";
+    link.click();
+}
+
+// Добавить кнопку для сохранения результатов
+const saveButton = document.createElement("button");
+saveButton.textContent = "Сохранить результаты";
+saveButton.style.marginTop = "20px";
+saveButton.style.padding = "10px 20px";
+saveButton.style.fontSize = "16px";
+saveButton.style.backgroundColor = "#ff6b6b";
+saveButton.style.color = "#ffffff";
+saveButton.style.border = "none";
+saveButton.style.borderRadius = "5px";
+saveButton.style.cursor = "pointer";
+saveButton.addEventListener("click", saveResultsToWord);
+document.body.appendChild(saveButton);
