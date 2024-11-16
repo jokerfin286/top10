@@ -2,6 +2,9 @@ let leftPhoto = document.getElementById('photo-left');
 let rightPhoto = document.getElementById('photo-right');
 let container = document.querySelector('.photo-container');
 
+// Подключение docx
+const { Document, Packer, Paragraph, TextRun, ImageRun } = docx;
+
 // Список всех изображений с баллами
 const images = [
     '1-1.jpg',
@@ -156,7 +159,7 @@ async function vote(choice) {
 }
 
 // Функция для отображения топ-10
-function showTop10() {
+async function showTop10() {
     const top10 = photos.sort((a, b) => b.score - a.score).slice(0, 10);
 
     container.innerHTML = '<h2>Топ-10 самых красивых девушек</h2>';
@@ -176,6 +179,64 @@ function showTop10() {
     });
 
     container.appendChild(list);
+
+    // Сохранение результатов в Word-файл
+    await saveResultsToWord(top10);
+}
+
+// Функция для сохранения результатов в Word
+async function saveResultsToWord(top10) {
+    const document = new Document();
+
+    // Заголовок
+    document.addSection({
+        children: [
+            new Paragraph({
+                text: "Топ-10 самых красивых девушек",
+                heading: "Heading1",
+                alignment: "center",
+            }),
+        ],
+    });
+
+    // Добавляем каждый элемент топа в документ
+    for (const [index, photo] of top10.entries()) {
+        const rankText = new Paragraph({
+            text: `${index + 1}. Место - ${photo.score} баллов`,
+            spacing: { after: 200 },
+        });
+
+        // Загружаем изображение как base64
+        const imgResponse = await fetch(photo.src);
+        const imgBlob = await imgResponse.blob();
+        const imgBuffer = await imgBlob.arrayBuffer();
+
+        const imageRun = new ImageRun({
+            data: imgBuffer,
+            transformation: {
+                width: 150,
+                height: 150,
+            },
+        });
+
+        const imgParagraph = new Paragraph({
+            children: [imageRun],
+            alignment: "center",
+        });
+
+        // Добавляем в документ
+        document.addSection({
+            children: [rankText, imgParagraph],
+        });
+    }
+
+    // Сохраняем документ как Word-файл
+    const packer = new Packer();
+    const blob = await packer.toBlob(document);
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "Top10_Girls.docx";
+    link.click();
 }
 
 // Обработчики событий для выбора фото
@@ -187,5 +248,3 @@ const initialPhotos = getRandomPhotos();
 if (initialPhotos) {
     updatePhotos(initialPhotos[0], initialPhotos[1]);
 }
-
-
