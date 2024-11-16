@@ -82,7 +82,7 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `images/${image}`, // путь без начального "/"
+    src: `images/${image}`, // Путь к изображению
     score: 0,
     selected: false,
 }));
@@ -145,13 +145,7 @@ async function vote(choice) {
         // Получаем новые фотографии для следующего голосования
         const nextPhotos = getRandomPhotos();
         if (nextPhotos) {
-            // Заменяем только невыбранную фотографию
-            if (choice === 'left') {
-                updatePhotos(nextPhotos[0], rightPhotoData);
-            } else {
-                updatePhotos(leftPhotoData, nextPhotos[1]);
-            }
-
+            updatePhotos(nextPhotos[0], nextPhotos[1]);
             leftPhoto.classList.add('fade-in');
             rightPhoto.classList.add('fade-in');
         }
@@ -206,17 +200,14 @@ async function saveResultsToWord(top10) {
             spacing: { after: 200 },
         });
 
-        // Загружаем изображение как base64
+        // Загружаем изображение
         const imgResponse = await fetch(photo.src);
         const imgBlob = await imgResponse.blob();
         const imgBuffer = await imgBlob.arrayBuffer();
 
         const imageRun = new ImageRun({
             data: imgBuffer,
-            transformation: {
-                width: 150,
-                height: 150,
-            },
+            transformation: { width: 150, height: 150 },
         });
 
         const imgParagraph = new Paragraph({
@@ -230,7 +221,7 @@ async function saveResultsToWord(top10) {
         });
     }
 
-    // Сохраняем документ как Word-файл
+    // Сохраняем документ
     const packer = new Packer();
     const blob = await packer.toBlob(document);
     const link = document.createElement("a");
@@ -239,11 +230,11 @@ async function saveResultsToWord(top10) {
     link.click();
 }
 
-// Обработчики событий для выбора фото
+// Обработчики событий
 leftPhoto.addEventListener('click', () => vote('left'));
 rightPhoto.addEventListener('click', () => vote('right'));
 
-// Инициализация фотографий
+// Инициализация
 const initialPhotos = getRandomPhotos();
 if (initialPhotos) {
     updatePhotos(initialPhotos[0], initialPhotos[1]);
