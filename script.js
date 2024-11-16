@@ -2,9 +2,6 @@ let leftPhoto = document.getElementById('photo-left');
 let rightPhoto = document.getElementById('photo-right');
 let container = document.querySelector('.photo-container');
 
-// Подключение docx
-const { Document, Packer, Paragraph, TextRun, ImageRun } = docx;
-
 // Список всех изображений с баллами
 const images = [
     '1-1.jpg',
@@ -82,7 +79,7 @@ const images = [
 
 // Массив для хранения баллов и состояния фотографий
 const photos = images.map(image => ({
-    src: `images/${image}`, // Путь к изображению
+    src: `images/${image}`, // путь без начального "/"
     score: 0,
     selected: false,
 }));
@@ -145,7 +142,13 @@ async function vote(choice) {
         // Получаем новые фотографии для следующего голосования
         const nextPhotos = getRandomPhotos();
         if (nextPhotos) {
-            updatePhotos(nextPhotos[0], nextPhotos[1]);
+            // Заменяем только невыбранную фотографию
+            if (choice === 'left') {
+                updatePhotos(nextPhotos[0], rightPhotoData);
+            } else {
+                updatePhotos(leftPhotoData, nextPhotos[1]);
+            }
+
             leftPhoto.classList.add('fade-in');
             rightPhoto.classList.add('fade-in');
         }
@@ -153,7 +156,7 @@ async function vote(choice) {
 }
 
 // Функция для отображения топ-10
-async function showTop10() {
+function showTop10() {
     const top10 = photos.sort((a, b) => b.score - a.score).slice(0, 10);
 
     container.innerHTML = '<h2>Топ-10 самых красивых девушек</h2>';
@@ -173,68 +176,13 @@ async function showTop10() {
     });
 
     container.appendChild(list);
-
-    // Сохранение результатов в Word-файл
-    await saveResultsToWord(top10);
 }
 
-// Функция для сохранения результатов в Word
-async function saveResultsToWord(top10) {
-    const document = new Document();
-
-    document.addSection({
-        children: [
-            new Paragraph({
-                text: "Топ-10 самых красивых девушек",
-                heading: "Heading1",
-                alignment: "center",
-            }),
-        ],
-    });
-
-    for (const [index, photo] of top10.entries()) {
-        const imgResponse = await fetch(photo.src);
-        const imgBlob = await imgResponse.blob();
-
-        const reader = new FileReader();
-
-        await new Promise((resolve) => {
-            reader.onload = () => {
-                const base64Image = reader.result.split(",")[1];
-
-                document.addSection({
-                    children: [
-                        new Paragraph({ text: `${index + 1}. ${photo.score} баллов` }),
-                        new Paragraph({
-                            children: [
-                                new ImageRun({
-                                    data: Buffer.from(base64Image, "base64"),
-                                    transformation: { width: 150, height: 150 },
-                                }),
-                            ],
-                        }),
-                    ],
-                });
-                resolve();
-            };
-            reader.readAsDataURL(imgBlob);
-        });
-    }
-
-    const packer = new Packer();
-    const blob = await packer.toBlob(document);
-
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "Top10_Girls.docx";
-    link.click();
-}
-
-// Обработчики событий
+// Обработчики событий для выбора фото
 leftPhoto.addEventListener('click', () => vote('left'));
 rightPhoto.addEventListener('click', () => vote('right'));
 
-// Инициализация
+// Инициализация фотографий
 const initialPhotos = getRandomPhotos();
 if (initialPhotos) {
     updatePhotos(initialPhotos[0], initialPhotos[1]);
