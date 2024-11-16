@@ -182,7 +182,6 @@ async function showTop10() {
 async function saveResultsToWord(top10) {
     const document = new Document();
 
-    // Заголовок
     document.addSection({
         children: [
             new Paragraph({
@@ -193,37 +192,38 @@ async function saveResultsToWord(top10) {
         ],
     });
 
-    // Добавляем каждый элемент топа в документ
     for (const [index, photo] of top10.entries()) {
-        const rankText = new Paragraph({
-            text: `${index + 1}. Место - ${photo.score} баллов`,
-            spacing: { after: 200 },
-        });
-
-        // Загружаем изображение
         const imgResponse = await fetch(photo.src);
         const imgBlob = await imgResponse.blob();
-        const imgBuffer = await imgBlob.arrayBuffer();
 
-        const imageRun = new ImageRun({
-            data: imgBuffer,
-            transformation: { width: 150, height: 150 },
-        });
+        const reader = new FileReader();
 
-        const imgParagraph = new Paragraph({
-            children: [imageRun],
-            alignment: "center",
-        });
+        await new Promise((resolve) => {
+            reader.onload = () => {
+                const base64Image = reader.result.split(",")[1];
 
-        // Добавляем в документ
-        document.addSection({
-            children: [rankText, imgParagraph],
+                document.addSection({
+                    children: [
+                        new Paragraph({ text: `${index + 1}. ${photo.score} баллов` }),
+                        new Paragraph({
+                            children: [
+                                new ImageRun({
+                                    data: Buffer.from(base64Image, "base64"),
+                                    transformation: { width: 150, height: 150 },
+                                }),
+                            ],
+                        }),
+                    ],
+                });
+                resolve();
+            };
+            reader.readAsDataURL(imgBlob);
         });
     }
 
-    // Сохраняем документ
     const packer = new Packer();
     const blob = await packer.toBlob(document);
+
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
     link.download = "Top10_Girls.docx";
